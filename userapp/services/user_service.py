@@ -1,4 +1,3 @@
-import json
 import userapp.util as util
 from userapp.exceptions import ClientException
 from userapp.repositories.user.abstract import AbstractUserRepository
@@ -21,17 +20,19 @@ class UserService:
         self._user_repo = user_repo
         self._session_repo = session_repo
 
-    def list_users(self):
+    def list_users(self) -> list[UserSchemaWithoutPassword]:
         # debug purpose for sample app.
-        users: list[UserSchema] = self._user_repo.get_users()
-        return json.dumps(
-            [
-                UserSchemaWithoutPassword.model_validate(user.model_dump()).model_dump()
-                for user in users
-            ]
-        )
+        users: list[UserSchemaWithoutPassword] = []
+        for user in self._user_repo.get_users():
+            d = user.model_dump()
+            users.append(UserSchemaWithoutPassword.model_validate(d))
+        return users
 
-    def get_user(self, username: str, cookies: dict):
+    def get_user(
+        self,
+        username: str,
+        cookies: dict,
+    ) -> UserSchemaWithoutPassword:
         try:
             session_uuid = cookies["session"]
             session_user_uuid = self._session_repo.get_session_user_uuid(session_uuid)
@@ -39,14 +40,10 @@ class UserService:
             if session_user_uuid != user.id:
                 raise ClientException
         except Exception:
-            raise ClientException("auth error")
-        return json.dumps(
-            UserSchemaWithoutPassword.model_validate(user.model_dump()).model_dump()
-        )
+            raise ClientException("authentication error")
+        return UserSchemaWithoutPassword.model_validate(user.model_dump())
 
-    def signup(self, body: str):
-        signup_obj: SignupBody = SignupBody.model_validate_json(body)
-
+    def signup(self, signup_obj: SignupBody) -> None:
         # validate
         username = signup_obj.username.strip()
         email = signup_obj.email.strip()
@@ -64,8 +61,7 @@ class UserService:
         # create user
         self._user_repo.create_user_atomically(username, email, raw_password1)
 
-    def signin(self, body: str) -> dict:
-        signin_obj: SigninBody = SigninBody.model_validate_json(body)
+    def signin(self, signin_obj: SigninBody) -> dict:
         username_or_email = signin_obj.username_or_email.strip()
         raw_password = signin_obj.password.strip()
         user = self._challenge_password(username_or_email, raw_password)
@@ -78,6 +74,13 @@ class UserService:
             "user_id": user.id,
         }
         return cookies
+
+    def signout(self, cookies: dict) -> list[str]:
+        if "session" in cookies:
+            session_uuid = cookies["session"]
+            self._session_repo.delete_session(session_uuid)
+        del_cookie_keys = ["session", "username", "user_id"]
+        return del_cookie_keys
 
     def _challenge_password(
         self, username_or_email: str, raw_password: str

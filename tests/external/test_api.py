@@ -36,6 +36,16 @@ def test_all():
     print(response.text)
     print()
 
+    print("test delete /api/signin")
+    response = session.delete(f"{BASE_URL}/api/signin")
+    print(response.text)
+    print()
+
+    print("test get /api/users/yuichi")
+    response = session.get(f"{BASE_URL}/api/users/yuichi")
+    print(response.text)
+    print()
+
     print("test post /api/users")
     signup_data = {
         "username": "tanzu",

@@ -20,3 +20,7 @@ class MockSessionRepository(AbstractSessionRepository):
         session_uuid = get_random_uuid()
         self._sessions[session_uuid] = user_uuid
         return session_uuid
+
+    def delete_session(self, session_uuid: str) -> bool:
+        if session_uuid in self._sessions:
+            del self._sessions[session_uuid]

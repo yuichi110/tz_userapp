@@ -13,3 +13,7 @@ class AbstractSessionRepository(ABC):
     @abstractmethod
     def create_session(self, user_uuid: str) -> str:
         ...
+
+    @abstractmethod
+    def delete_session(self, session_uuid: str) -> str:
+        ...

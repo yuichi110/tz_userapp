@@ -13,43 +13,45 @@ def test_all():
 
     # list_users()
     users = service.list_users()
-    assert len(json.loads(users)) == 2
+    assert len(users) == 2
 
     # signup
-    j = SignupBody(
+    o = SignupBody(
         username="tanzu",
         email="tanzu@vmware.com",
         password1="p@ssw0rd",
         password2="p@ssw0rd",
-    ).model_dump_json()
-    service.signup(j)
+    )
+    service.signup(o)
     users = service.list_users()
-    assert len(json.loads(users)) == 3
+    assert len(users) == 3
 
+    # signup dup username
     with pytest.raises(ClientException) as exc_info:
         service.signup(
             SignupBody(
                 username="tanzu",
-                email="tanzu@vmware.com",
+                email="tanzu2@vmware.com",
                 password1="p@ssw0rd",
                 password2="p@ssw0rd",
-            ).model_dump_json()
+            )
         )
     assert exc_info.type is ClientException
 
     # signin
-    j = SigninBody(
+    o = SigninBody(
         username_or_email="tanzu",
         password="p@ssw0rd",
-    ).model_dump_json()
-    cookies = service.signin(j)
+    )
+    cookies = service.signin(o)
 
+    # signin not exist user
     with pytest.raises(ClientException) as exc_info:
         service.signin(
             SigninBody(
                 username_or_email="guest",
                 password="p@ssw0rd",
-            ).model_dump_json()
+            )
         )
     assert exc_info.type is ClientException
 

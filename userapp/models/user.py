@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class BlankJsonSchema(BaseModel):
+    ...
+
+
 class UserSchema(BaseModel):
     id: str
     username: str
