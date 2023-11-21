@@ -2,39 +2,44 @@
 ## Python Flask Web App 
 ### How to run locally
 
-0. install poetry
+0. install poetry, python project management tool
 1. cd to project root
-2. poetry update
-3. poetry run gunicorn  -w 1 -b 0.0.0.0:8000 --reload userapp.__main__:app
+2. issue `poetry install` for setup
+3. `poetry run gunicorn  -w 1 -b 0.0.0.0:8000 --reload userapp.__main__:app`
 
 ### How to test
 #### unit test
-poetry run pytest
+- `poetry run pytest`
 
 #### external api test
-poetry python tests/external/test_api.py
+- `poetry python tests/external/test_api.py`
 
 you can configure PROTOCOL(http/https), HOST, PORT via environment variable.
+please see the test code for details.
 
 ### API DOC
+
+Please check `__main__.py` and `models/user.py` for detail url and request/response body.
 
 #### get users (debug)
 - method: GET
 - URI: /api/users
 - REQUEST BODY:
-- RESPONSE BODY: [{id:<user-uuid>, username:<user-name>, email:<email>},...]
+- RESPONSE BODY: [{id:\<user-uuid\>, username:\<user-name\>, email:\<email\>},...]
 
 #### get user
 - method: GET
-- URI: /api/users/<signin-username>
+- URI: /api/users/\<signin-username\>
 - REQUEST BODY:
-- RESPONSE BODY: {id:<user-uuid>, username:<user-name>, email:<email>}
-Requires signin first. Requesting other username returns error
+- RESPONSE BODY: {id:\<user-uuid\>, username:\<user-name\>, email:\<email\>}
+
+Requires signin first and create session.
+Requesting other username returns error.
 
 #### signin
 - method: POST
 - URI: /api/signin
-- REQUEST BODY: {username_or_email:<username-or-email>, password:<password>}
+- REQUEST BODY: {username_or_email:\<username-or-email\>, password:\<password\>}
 - RESPONSE BODY: {}
 
 #### signout
@@ -43,11 +48,16 @@ Requires signin first. Requesting other username returns error
 - REQUEST BODY:
 - RESPONSE BODY: {}
 
+without signin state, error doesn't happen.
+
 #### signup
 - method: POST
 - URI: /api/users
-- REQUEST BODY: {username:<username>, email:<email>, password1:<password>, password2:<password>}
+- REQUEST BODY: {username:\<username\>, email:\<email\>, password1:\<password\>, password2:\<password\>}
 - RESPONSE BODY: {}
+
+Choosing existing username or email will fail.
+password1 and password2 need to be matched.
 
 ### Architecture
 
@@ -74,3 +84,20 @@ However able to add another repositories such as DB/Cache without chainging buis
 
 ## Tanzu Application Platform
 
+### Sample create app command
+
+```
+$ tanzu apps workload create tz-userapp \
+-a tz-userapp \
+--annotation autoscaling.knative.dev/minScale=1 \
+--annotation autoscaling.knative.dev/maxScale=1 \
+--git-repo https://github.com/yuichi110/tz_userapp \
+--git-branch main \
+--type web \
+--yes \
+--namespace demo
+```
+
+### Caution
+
+If you want to scale out, please use DB/Cache for repository implementation.
