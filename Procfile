@@ -1,1 +1,1 @@
-web: gunicorn -b 0.0.0.0:8080 userapp.__main__:app --log-file=- --reload --access-logfile=- --workers=2 --threads=4 --worker-class=gthread
+web: uvicorn --host 0.0.0.0 --port 8080 userapp.__main__:app

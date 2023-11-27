@@ -5,7 +5,7 @@
 0. install poetry, python project management tool
 1. cd to project root
 2. issue `poetry install` for setup
-3. `poetry run gunicorn  -w 1 -b 0.0.0.0:8000 --reload userapp.__main__:app`
+3. `poetry run uvicorn --host 0.0.0.0 --port 8000 userapp.__main__:app --reload`
 
 ### How to test
 #### unit test
@@ -19,7 +19,9 @@ please see the test code for details.
 
 ### API DOC
 
-Please check `__main__.py` and `models/user.py` for detail url and request/response body.
+Swagger is provided at the server on `/redoc`
+
+Please check `controllers/user.py` and `models/user.py` for detail url and request/response body.
 
 #### get users (debug)
 - method: GET
