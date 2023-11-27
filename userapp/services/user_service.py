@@ -1,3 +1,5 @@
+from logging import Logger
+
 import userapp.util as util
 from userapp.exceptions import ClientException
 from userapp.repositories.user.abstract import AbstractUserRepository
@@ -16,9 +18,11 @@ class UserService:
         self,
         user_repo: AbstractUserRepository,
         session_repo: AbstractSessionRepository,
+        logger: Logger,
     ):
         self._user_repo = user_repo
         self._session_repo = session_repo
+        self._logger = logger
 
     def list_users(self) -> list[UserSchemaWithoutPassword]:
         # debug purpose for sample app.

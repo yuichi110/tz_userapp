@@ -1,3 +1,4 @@
+from logging import Logger
 from cachetools import TTLCache
 from userapp.repositories.session.abstract import AbstractSessionRepository
 from userapp.util import get_random_uuid
@@ -7,7 +8,7 @@ _THREE_HOUR = 60 * 60 * 3
 
 
 class MockSessionRepository(AbstractSessionRepository):
-    def __init__(self):
+    def __init__(self, logger: Logger):
         self._sessions = TTLCache(maxsize=_CACHE_SIZE, ttl=_THREE_HOUR)
 
     def exist_session(self, session_uuid: str) -> bool:

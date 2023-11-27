@@ -1,3 +1,4 @@
+import logging
 import pytest
 from userapp.repositories.user.mock import MockUserRepository
 from userapp.exceptions import ClientException
@@ -6,7 +7,7 @@ from userapp.util import get_hashed_password
 
 def test_all():
     # should create tests for all methods
-    repo = MockUserRepository()
+    repo = MockUserRepository(logging.getLogger())
     assert len(repo.get_users()) == 2
 
     user1 = repo.get_user_by_id("34b8584f-d79f-4b50-b20f-d0abbc87676e")
@@ -32,7 +33,7 @@ def test_all():
 
 
 def test_create():
-    repo = MockUserRepository()
+    repo = MockUserRepository(logging.getLogger())
     username = "tanzu"
     email = "tanzu@vmware.com"
     password = "weak_password"

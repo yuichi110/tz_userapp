@@ -1,3 +1,4 @@
+from logging import Logger
 import pandas as pd
 
 from userapp.exceptions import ClientException
@@ -22,7 +23,8 @@ _INITIAL_USERS = [
 
 
 class MockUserRepository(AbstractUserRepository):
-    def __init__(self):
+    def __init__(self, logger: Logger):
+        self._logger = logger
         self._users = pd.DataFrame([o.model_dump() for o in _INITIAL_USERS])
 
     def get_users(self) -> list[UserSchema]:

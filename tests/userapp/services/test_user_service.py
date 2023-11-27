@@ -1,4 +1,4 @@
-import json
+import logging
 import pytest
 from userapp.services.user_service import UserService
 from userapp.repositories.session.mock import MockSessionRepository
@@ -9,7 +9,10 @@ from userapp.exceptions import ClientException
 
 def test_all():
     # please create tests for each method
-    service = UserService(MockUserRepository(), MockSessionRepository())
+    logger = logging.getLogger()
+    service = UserService(
+        MockUserRepository(logger), MockSessionRepository(logger), logger
+    )
 
     # list_users()
     users = service.list_users()
